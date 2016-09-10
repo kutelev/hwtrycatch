@@ -1,0 +1,27 @@
+language: cpp
+
+addons:
+    apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-4.8
+
+install:
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90; fi
+
+script:
+- git clone --branch release-1.8.0 --depth 1 https://github.com/google/googletest.git
+- cmake -DCMAKE_VERBOSE_MAKEFILE=1 .
+- cmake --build . --config Release
+
+after_success:
+- ./hwtrycatch
+
+matrix:
+    include:
+        - os: linux
+          sudo: required
+        - os: osx
+          osx_image: xcode8
