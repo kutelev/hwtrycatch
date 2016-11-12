@@ -8,7 +8,7 @@
 #include <excpt.h>
 #include <windows.h>
 #else
-#include <signal.h>
+#include <csignal>
 #endif
 
 static thread_local ExecutionContext * execution_context = nullptr;

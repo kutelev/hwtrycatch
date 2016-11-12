@@ -4,6 +4,11 @@
 #include <cstring>
 #include <limits>
 
+#if defined(NDEBUG)
+#undef NDEBUG
+#endif
+#include <cassert>
+
 #include <src/gmock-all.cc>
 #include <src/gtest-all.cc>
 
@@ -151,6 +156,47 @@ TEST(DeathTest, ReturnFromCatch)
     returnFromCatch();
     EXPECT_DEATH(raiseRecoverableException(), "");
     ExecutionContext::stopHwExceptionHandling();
+}
+
+TEST(DeathTest, AssertInsideTry)
+{
+    bool status = true;
+
+    ExecutionContext::startHwExceptionHandling();
+
+    HW_TRY {
+        EXPECT_DEATH(assert(0), "");
+    }
+    HW_CATCH() {
+        status = false;
+    }
+    HW_FINALLY{
+    }
+
+    ExecutionContext::stopHwExceptionHandling();
+
+    EXPECT_EQ(status, true);
+}
+
+TEST(DeathTest, AssertInsideCatch)
+{
+    bool status = true;
+
+    ExecutionContext::startHwExceptionHandling();
+
+    HW_TRY {
+        raiseRecoverableException();
+    }
+    HW_CATCH() {
+        EXPECT_DEATH(assert(0), "");
+        status = false;
+    }
+    HW_FINALLY{
+    }
+
+    ExecutionContext::stopHwExceptionHandling();
+
+    EXPECT_EQ(status, false);
 }
 
 TEST(SingleThread, ExplicitHwThrow)
