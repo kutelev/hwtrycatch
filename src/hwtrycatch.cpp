@@ -15,8 +15,11 @@ static thread_local ExecutionContext * execution_context = nullptr;
 static std::atomic<int> user_count(0);
 static std::mutex mutex;
 
-ExecutionContext::ExecutionContext() : prev_context(execution_context), dirty(false)
+ExecutionContext::ExecutionContext() : prev_context(execution_context)
 {
+#if defined(PLATFORM_OS_WINDOWS)
+    dirty = false;
+#endif
     execution_context = this;
 }
 
