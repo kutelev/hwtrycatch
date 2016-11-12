@@ -8,11 +8,10 @@
 class ExecutionContext final {
 public:
     ExecutionContext();
+    ~ExecutionContext();
 
     static void startHwExceptionHandling();
     static void stopHwExceptionHandling();
-
-    static void finally();
 
     static void throwHwException();
 
@@ -27,7 +26,7 @@ private:
 
 #define HW_TRY { ExecutionContext execution_context; if (!setjmp(execution_context.environment))
 #define HW_CATCH() else
-#define HW_FINALLY ExecutionContext::finally(); }
+#define HW_FINALLY }
 
 #define HW_THROW() ExecutionContext::throwHwException()
 

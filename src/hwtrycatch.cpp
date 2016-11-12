@@ -15,6 +15,10 @@ static thread_local ExecutionContext * execution_context = nullptr;
 static std::atomic<int> user_count(0);
 static std::mutex mutex;
 
+#if defined(PLATFORM_OS_WINDOWS)
+static PVOID exception_handler_handle = 0;
+#endif
+
 ExecutionContext::ExecutionContext() : prev_context(execution_context)
 {
 #if defined(PLATFORM_OS_WINDOWS)
@@ -23,9 +27,16 @@ ExecutionContext::ExecutionContext() : prev_context(execution_context)
     execution_context = this;
 }
 
+ExecutionContext::~ExecutionContext()
+{
 #if defined(PLATFORM_OS_WINDOWS)
+    if (execution_context->dirty)
+        RemoveVectoredExceptionHandler(exception_handler_handle);
+#endif
+    execution_context = execution_context->prev_context;
+}
 
-static PVOID exception_handler_handle = 0;
+#if defined(PLATFORM_OS_WINDOWS)
 
 static LONG WINAPI vectoredExceptionHandler(struct _EXCEPTION_POINTERS *_exception_info)
 {
@@ -122,15 +133,6 @@ void ExecutionContext::stopHwExceptionHandling()
             signal(signum, SIG_DFL);
     }
 #endif
-}
-
-void ExecutionContext::finally()
-{
-#if defined(PLATFORM_OS_WINDOWS)
-    if (execution_context->dirty)
-        RemoveVectoredExceptionHandler(exception_handler_handle);
-#endif
-    execution_context = execution_context->prev_context;
 }
 
 void ExecutionContext::throwHwException()

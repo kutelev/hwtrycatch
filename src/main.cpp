@@ -55,7 +55,6 @@ static void exceptionInsideCatch()
     }
 }
 
-#if !defined(PLATFORM_OS_WINDOWS)
 static int returnFromCatch()
 {
     HW_TRY {
@@ -69,7 +68,6 @@ static int returnFromCatch()
 
     return 0;
 }
-#endif
 
 #if !defined(PLATFORM_OS_WINDOWS)
 static int infiniteRecursion(int arg)
@@ -147,19 +145,13 @@ TEST(DeathTest, ExceptionInsideCatch)
     ExecutionContext::stopHwExceptionHandling();
 }
 
-#if !defined(PLATFORM_OS_WINDOWS)
 TEST(DeathTest, ReturnFromCatch)
 {
-    int result = 0;
-
     ExecutionContext::startHwExceptionHandling();
     returnFromCatch();
-    result = raiseRecoverableException();
+    EXPECT_DEATH(raiseRecoverableException(), "");
     ExecutionContext::stopHwExceptionHandling();
-
-    EXPECT_NE(result, 0);
 }
-#endif
 
 TEST(SingleThread, ExplicitHwThrow)
 {
