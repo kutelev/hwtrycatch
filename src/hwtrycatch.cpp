@@ -29,13 +29,19 @@ static PVOID exception_handler_handle = 0;
 
 static LONG WINAPI vectoredExceptionHandler(struct _EXCEPTION_POINTERS *_exception_info)
 {
+    struct ExecutionContextStruct {
+        jmp_buf environment;
+        ExecutionContext * prev_context;
+        bool dirty;
+    };
+
     if (!execution_context ||
         _exception_info->ExceptionRecord->ExceptionCode == DBG_PRINTEXCEPTION_C ||
         _exception_info->ExceptionRecord->ExceptionCode == 0xE06D7363L /* C++ exception */
     )
         return EXCEPTION_CONTINUE_SEARCH;
 
-    execution_context->dirty = true;
+    reinterpret_cast<ExecutionContextStruct *>(execution_context)->dirty = true;
     longjmp(execution_context->environment, 0);
 }
 

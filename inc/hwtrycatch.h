@@ -20,9 +20,7 @@ public:
 
 private:
     ExecutionContext * prev_context;
-
 #if defined(PLATFORM_OS_WINDOWS)
-public:
     bool dirty;
 #endif
 };
