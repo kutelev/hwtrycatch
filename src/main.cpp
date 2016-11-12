@@ -392,3 +392,25 @@ TEST(SingleThread, StackOverflow)
     EXPECT_EQ(result, 100500);
 }
 #endif
+
+#if defined(PLATFORM_OS_WINDOWS)
+TEST(SingleThread, OutputDebugStringA)
+{
+    bool status = true;
+
+    ExecutionContext::startHwExceptionHandling();
+
+    HW_TRY {
+        OutputDebugStringA("Debug message.\n");
+    }
+    HW_CATCH() {
+        status = false;
+    }
+    HW_FINALLY {
+    }
+
+    ExecutionContext::stopHwExceptionHandling();
+
+    EXPECT_EQ(status, true);
+}
+#endif
