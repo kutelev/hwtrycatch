@@ -7,4 +7,4 @@ build_script:
 
     cmake --build . --config Release
 test_script:
-- cmd: .\Release\hwtrycatch.exe
+- cmd: .\Release\hwtrycatch_tests.exe

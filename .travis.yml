@@ -17,7 +17,7 @@ script:
 - cmake --build . --config Release
 
 after_success:
-- ./hwtrycatch
+- ./hwtrycatch_tests
 
 matrix:
     include:
