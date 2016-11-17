@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <limits>
+#include <thread>
 
 #if defined(NDEBUG)
 #undef NDEBUG
@@ -209,7 +210,7 @@ TEST(SingleThread, ExplicitHwThrow)
     EXPECT_EQ(status, false);
 }
 
-TEST(SingleThread, SingleIteration)
+static void singleIteration()
 {
     bool status = true;
 
@@ -227,7 +228,7 @@ TEST(SingleThread, SingleIteration)
     EXPECT_EQ(status, false);
 }
 
-TEST(SingleThread, MultipleIterations)
+static void multipleIterations()
 {
     HwExceptionHandler hw_exception_handler;
 
@@ -247,7 +248,7 @@ TEST(SingleThread, MultipleIterations)
     }
 }
 
-TEST(SingleThread, MultipleIterationsWithReinitialization)
+static void multipleIterationsWithReinitialization()
 {
     for (int i = 0; i < 100; ++i) {
         bool status = true;
@@ -265,6 +266,22 @@ TEST(SingleThread, MultipleIterationsWithReinitialization)
 
         EXPECT_EQ(status, false);
     }
+}
+
+
+TEST(SingleThread, SingleIteration)
+{
+    singleIteration();
+}
+
+TEST(SingleThread, MultipleIterations)
+{
+    multipleIterations();
+}
+
+TEST(SingleThread, MultipleIterationsWithReinitialization)
+{
+    multipleIterationsWithReinitialization();
 }
 
 static int nestedTryCatch(int depth, int max_depth, int exception_depth)
@@ -390,5 +407,40 @@ TEST(SingleThread, OutputDebugStringA)
     }
 
     EXPECT_EQ(status, true);
+}
+#endif
+
+TEST(MultiThread, SingleIteration)
+{
+    std::thread threads[100];
+
+    for (int i = 0; i < 100; ++i)
+        threads[i] = std::thread(singleIteration);
+
+    for (int i = 0; i < 100; ++i)
+        threads[i].join();
+}
+
+TEST(MultiThread, MultipleIterations)
+{
+    std::thread threads[100];
+
+    for (int i = 0; i < 100; ++i)
+        threads[i] = std::thread(multipleIterations);
+
+    for (int i = 0; i < 100; ++i)
+        threads[i].join();
+}
+
+#if 0
+TEST(MultiThread, MultipleIterationsWithReinitialization)
+{
+    std::thread threads[100];
+
+    for (int i = 0; i < 100; ++i)
+        threads[i] = std::thread(multipleIterationsWithReinitialization);
+
+    for (int i = 0; i < 100; ++i)
+        threads[i].join();
 }
 #endif
