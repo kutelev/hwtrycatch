@@ -90,9 +90,10 @@ static void signalHandler(int signum)
 
 #endif
 
-void ExecutionContext::startHwExceptionHandling()
+HwExceptionHandler::HwExceptionHandler()
 {
     std::lock_guard<std::mutex> lock(mutex);
+
     if (++user_count != 1)
         return;
 
@@ -116,9 +117,10 @@ void ExecutionContext::startHwExceptionHandling()
 #endif
 }
 
-void ExecutionContext::stopHwExceptionHandling()
+HwExceptionHandler::~HwExceptionHandler()
 {
     std::lock_guard<std::mutex> lock(mutex);
+
     if (--user_count != 0)
         return;
 

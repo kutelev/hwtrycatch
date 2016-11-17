@@ -5,13 +5,16 @@
 
 #include "platform.h"
 
+class HwExceptionHandler final {
+public:
+    HwExceptionHandler();
+    ~HwExceptionHandler();
+};
+
 class ExecutionContext final {
 public:
     ExecutionContext();
     ~ExecutionContext();
-
-    static void startHwExceptionHandling();
-    static void stopHwExceptionHandling();
 
     static void throwHwException();
 

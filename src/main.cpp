@@ -93,31 +93,31 @@ TEST(DeathTest, UnhandledExceptionHandlingNotStarted)
 
 TEST(DeathTest, UnhandledExceptionHandlingStarted)
 {
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
+
     EXPECT_DEATH(raiseRecoverableException(), "");
-    ExecutionContext::stopHwExceptionHandling();
 }
 
 TEST(DeathTest, UnhandledExceptionHandlingStopped)
 {
-    ExecutionContext::startHwExceptionHandling();
-    ExecutionContext::stopHwExceptionHandling();
+    { HwExceptionHandler hw_exception_handler; }
     EXPECT_DEATH(raiseRecoverableException(), "");
 }
 
 TEST(DeathTest, UnhandledExceptionInsideHwTryHandlingStopped)
 {
-    ExecutionContext::startHwExceptionHandling();
+    {
+        HwExceptionHandler hw_exception_handler;
 
-    HW_TRY {
-        raiseRecoverableException();
-    }
-    HW_CATCH() {
-    }
-    HW_FINALLY {
-    }
+        HW_TRY {
+            raiseRecoverableException();
+        }
+        HW_CATCH() {
+        }
+        HW_FINALLY {
+        }
 
-    ExecutionContext::stopHwExceptionHandling();
+    }
 
     HW_TRY {
         EXPECT_DEATH(raiseRecoverableException(), "");
@@ -130,7 +130,7 @@ TEST(DeathTest, UnhandledExceptionInsideHwTryHandlingStopped)
 
 TEST(DeathTest, UnrecoverableError)
 {
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
 
     HW_TRY {
         EXPECT_DEATH(raiseUnrecoverableException(), "");
@@ -139,30 +139,28 @@ TEST(DeathTest, UnrecoverableError)
     }
     HW_FINALLY {
     }
-
-    ExecutionContext::stopHwExceptionHandling();
 }
 
 TEST(DeathTest, ExceptionInsideCatch)
 {
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
+
     EXPECT_DEATH(exceptionInsideCatch(), "");
-    ExecutionContext::stopHwExceptionHandling();
 }
 
 TEST(DeathTest, ReturnFromCatch)
 {
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
+
     returnFromCatch();
     EXPECT_DEATH(raiseRecoverableException(), "");
-    ExecutionContext::stopHwExceptionHandling();
 }
 
 TEST(DeathTest, AssertInsideTry)
 {
     bool status = true;
 
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
 
     HW_TRY {
         EXPECT_DEATH(assert(0), "");
@@ -173,8 +171,6 @@ TEST(DeathTest, AssertInsideTry)
     HW_FINALLY{
     }
 
-    ExecutionContext::stopHwExceptionHandling();
-
     EXPECT_EQ(status, true);
 }
 
@@ -182,7 +178,7 @@ TEST(DeathTest, AssertInsideCatch)
 {
     bool status = true;
 
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
 
     HW_TRY {
         raiseRecoverableException();
@@ -193,8 +189,6 @@ TEST(DeathTest, AssertInsideCatch)
     }
     HW_FINALLY{
     }
-
-    ExecutionContext::stopHwExceptionHandling();
 
     EXPECT_EQ(status, false);
 }
@@ -219,7 +213,7 @@ TEST(SingleThread, SingleIteration)
 {
     bool status = true;
 
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
 
     HW_TRY {
         raiseRecoverableException();
@@ -230,14 +224,12 @@ TEST(SingleThread, SingleIteration)
     HW_FINALLY {
     }
 
-    ExecutionContext::stopHwExceptionHandling();
-
     EXPECT_EQ(status, false);
 }
 
 TEST(SingleThread, MultipleIterations)
 {
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
 
     for (int i = 0; i < 100; ++i) {
         bool status = true;
@@ -253,8 +245,6 @@ TEST(SingleThread, MultipleIterations)
 
         EXPECT_EQ(status, false);
     }
-
-    ExecutionContext::stopHwExceptionHandling();
 }
 
 TEST(SingleThread, MultipleIterationsWithReinitialization)
@@ -262,7 +252,7 @@ TEST(SingleThread, MultipleIterationsWithReinitialization)
     for (int i = 0; i < 100; ++i) {
         bool status = true;
 
-        ExecutionContext::startHwExceptionHandling();
+        HwExceptionHandler hw_exception_handler;
 
         HW_TRY {
             raiseRecoverableException();
@@ -272,8 +262,6 @@ TEST(SingleThread, MultipleIterationsWithReinitialization)
         }
         HW_FINALLY {
         }
-
-        ExecutionContext::stopHwExceptionHandling();
 
         EXPECT_EQ(status, false);
     }
@@ -306,21 +294,19 @@ TEST(SingleThread, NestedTryCatch)
 {
     static int max_depth = 50;
 
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
 
     for (int i = 0; i < 100; ++i) {
         int exception_depth = rand() % max_depth;
         EXPECT_EQ(nestedTryCatch(0, max_depth, exception_depth), exception_depth);
     }
-
-    ExecutionContext::stopHwExceptionHandling();
 }
 
 TEST(SingleThread, NestedCppTryCatch)
 {
     bool status_hw = true, status_cpp = true;
 
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
 
     HW_TRY {
         try {
@@ -336,8 +322,6 @@ TEST(SingleThread, NestedCppTryCatch)
     HW_FINALLY {
     }
 
-    ExecutionContext::stopHwExceptionHandling();
-
     EXPECT_EQ(status_hw, true);
     EXPECT_EQ(status_cpp, false);
 }
@@ -348,7 +332,7 @@ TEST(SingleThread, TryCatchFinallyCountMatch)
     int catch_count = 0;
     int finally_count = 0;
 
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
 
     for (int i = 0; i < 100; ++i) {
         HW_TRY {
@@ -363,8 +347,6 @@ TEST(SingleThread, TryCatchFinallyCountMatch)
         }
     }
 
-    ExecutionContext::stopHwExceptionHandling();
-
     EXPECT_EQ(try_count, catch_count);
     EXPECT_EQ(try_count, finally_count);
 }
@@ -375,7 +357,7 @@ TEST(SingleThread, StackOverflow)
     bool status = true;
     int result = 100500;
 
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
 
     HW_TRY {
         result = infiniteRecursion(100);
@@ -385,8 +367,6 @@ TEST(SingleThread, StackOverflow)
     }
     HW_FINALLY {
     }
-
-    ExecutionContext::stopHwExceptionHandling();
 
     EXPECT_EQ(status, false);
     EXPECT_EQ(result, 100500);
@@ -398,7 +378,7 @@ TEST(SingleThread, OutputDebugStringA)
 {
     bool status = true;
 
-    ExecutionContext::startHwExceptionHandling();
+    HwExceptionHandler hw_exception_handler;
 
     HW_TRY {
         OutputDebugStringA("Debug message.\n");
@@ -408,8 +388,6 @@ TEST(SingleThread, OutputDebugStringA)
     }
     HW_FINALLY {
     }
-
-    ExecutionContext::stopHwExceptionHandling();
 
     EXPECT_EQ(status, true);
 }
