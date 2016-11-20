@@ -15,14 +15,16 @@
 #include <TargetConditionals.h>
 #endif
 
-#if defined(__linux__)
+#if defined(__linux__) && defined(__ANDROID__)
+#define PLATFORM_OS_ANDROID
+#elif defined(__linux__)
 #define PLATFORM_OS_LINUX
 #elif defined(_WIN32) || defined(_WIN64)
 #define PLATFORM_OS_WINDOWS
 #elif defined(__APPLE__) && TARGET_OS_MAC == 1
 #define PLATFORM_OS_MAC_OS_X
 #else
-#error "Unsupported OS. Supported operating systems are: Windows, Linux, Mac OS X."
+#error "Unsupported OS. Supported operating systems are: Windows, Linux, Mac OS X, Android"
 #endif
 
 #if defined(PLATFORM_OS_WINDOWS) && !defined(PLATFORM_COMPILER_MSVC)

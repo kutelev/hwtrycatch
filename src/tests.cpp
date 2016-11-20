@@ -26,7 +26,7 @@ static int raiseRecoverableException()
 {
     static char tiny_array[4] = {0, 1, 2, 3};
     int result = 0;
-    for (long long int i = 0; i < std::numeric_limits<long long int>::max(); ++i)
+    for (long long int i = 0; result != 100500; ++i)
         result = (result + tiny_array[i]) / tiny_array[i];
     char * invalid_pointer = 0;
     invalid_pointer[0] = 0;
@@ -46,7 +46,7 @@ static void raiseUnrecoverableException()
 
 static void exceptionInsideCatch()
 {
-    int i = 0;
+    volatile int i = 0;
 
     HW_TRY {
         if (i == 0)
@@ -78,12 +78,7 @@ static int returnFromCatch()
 #if !defined(PLATFORM_OS_WINDOWS)
 static int infiniteRecursion(int arg)
 {
-    if (arg)
-        arg = infiniteRecursion(arg ^ 0xAA);
-    else
-        arg += 100;
-
-    return arg;
+    return infiniteRecursion(arg - 1) + infiniteRecursion(arg - 2);
 }
 #endif
 
@@ -287,7 +282,7 @@ TEST(SingleThread, MultipleIterationsWithReinitialization)
 static int nestedTryCatch(int depth, int max_depth, int exception_depth)
 {
     bool status = true;
-    int result = depth;
+    volatile int result = depth;
 
     HW_TRY {
         if (depth == exception_depth)
@@ -345,9 +340,9 @@ TEST(SingleThread, NestedCppTryCatch)
 
 TEST(SingleThread, TryCatchFinallyCountMatch)
 {
-    int try_count = 0;
-    int catch_count = 0;
-    int finally_count = 0;
+    volatile int try_count = 0;
+    volatile int catch_count = 0;
+    volatile int finally_count = 0;
 
     HwExceptionHandler hw_exception_handler;
 
@@ -377,7 +372,7 @@ TEST(SingleThread, StackOverflow)
     HwExceptionHandler hw_exception_handler;
 
     HW_TRY {
-        result = infiniteRecursion(100);
+        result = infiniteRecursion(100500);
     }
     HW_CATCH() {
         status = false;
