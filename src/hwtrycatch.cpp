@@ -1,4 +1,5 @@
 #include <atomic>
+#include <cstring>
 #include <mutex>
 
 #include "hwtrycatch.h"
@@ -10,6 +11,8 @@
 #else
 #include <csignal>
 #endif
+
+namespace hwtrycatch {
 
 static thread_local ExecutionContext * execution_context = nullptr;
 static std::atomic<int> user_count(0);
@@ -36,16 +39,19 @@ ExecutionContext::~ExecutionContext()
     execution_context = execution_context->prev_context;
 }
 
+struct ExecutionContextStruct {
+    jmp_buf environment;
+    ExecutionContext * prev_context;
+#if defined(PLATFORM_OS_WINDOWS)
+    bool dirty;
+#endif
+    int exception_type;
+};
+
 #if defined(PLATFORM_OS_WINDOWS)
 
 static LONG WINAPI vectoredExceptionHandler(struct _EXCEPTION_POINTERS *_exception_info)
 {
-    struct ExecutionContextStruct {
-        jmp_buf environment;
-        ExecutionContext * prev_context;
-        bool dirty;
-    };
-
     if (!execution_context ||
         _exception_info->ExceptionRecord->ExceptionCode == DBG_PRINTEXCEPTION_C ||
         _exception_info->ExceptionRecord->ExceptionCode == 0xE06D7363L /* C++ exception */
@@ -53,6 +59,7 @@ static LONG WINAPI vectoredExceptionHandler(struct _EXCEPTION_POINTERS *_excepti
         return EXCEPTION_CONTINUE_SEARCH;
 
     reinterpret_cast<ExecutionContextStruct *>(execution_context)->dirty = true;
+    reinterpret_cast<ExecutionContextStruct *>(execution_context)->exception_type = _exception_info->ExceptionRecord->ExceptionCode;
     longjmp(execution_context->environment, 0);
 }
 
@@ -77,6 +84,7 @@ static void signalHandler(int signum)
         sigemptyset(&signals);
         sigaddset(&signals, signum);
         sigprocmask(SIG_UNBLOCK, &signals, NULL);
+        reinterpret_cast<ExecutionContextStruct *>(execution_context)->exception_type = signum;
         longjmp(execution_context->environment, 0);
     }
     else if (prev_handlers[signum - MIN_SIGNUM].sa_handler) {
@@ -137,7 +145,24 @@ HwExceptionHandler::~HwExceptionHandler()
 #endif
 }
 
-void ExecutionContext::throwHwException()
+const char * ExecutionContext::humanReadableName() const
 {
-    longjmp(execution_context->environment, 0);
+#if defined(PLATFORM_OS_WINDOWS)
+    switch (exception_type) {
+        case EXCEPTION_ACCESS_VIOLATION:
+            return "Access violation";
+        case EXCEPTION_ILLEGAL_INSTRUCTION:
+            return "Illegal instruction";
+        case EXCEPTION_INT_DIVIDE_BY_ZERO:
+            return "Divide by zero";
+        case EXCEPTION_STACK_OVERFLOW:
+            return "Stack overflow";
+        default:
+            return "Unknown exception";
+    }
+#else
+    return strsignal(exception_type);
+#endif
+}
+
 }

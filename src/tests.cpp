@@ -16,6 +16,8 @@
 #include "platform.h"
 #include "hwtrycatch.h"
 
+using namespace hwtrycatch;
+
 GTEST_API_ int main (int argc, char** argv)
 {
     testing::InitGoogleMock (&argc, argv);
@@ -171,21 +173,6 @@ TEST(DeathTest, AssertInsideCatch)
     }
     catch(...) {
         EXPECT_DEATH(assert(0), "");
-        status = false;
-    }
-
-    EXPECT_EQ(status, false);
-}
-
-TEST(SingleThread, ExplicitHwThrow)
-{
-    bool status = true;
-
-    try {
-        HW_TO_SW_CONVERTER();
-        ExecutionContext::throwHwException();
-    }
-    catch(...) {
         status = false;
     }
 
@@ -443,11 +430,11 @@ TEST(SingleThread, NestedCppTryCatch)
         try {
             throw 0;
         }
-        catch (...) {
+        catch (int) {
             status_cpp = false;
         }
     }
-    catch(...) {
+    catch(const HwException &) {
         status_hw = false;
     }
 
