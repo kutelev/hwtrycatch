@@ -5,7 +5,7 @@
 
 ## Description ##
 
-**hwtrycatch** provides cross-platform way of catching hardware exceptions (like access violation or division by zero) in manner similar to the standard C++ try/catch blocks. After catching exception application can exit gracefully or continue execution.
+**hwtrycatch** provides cross-platform way of catching hardware exceptions (like access violation or division by zero) using standard C++ try/catch blocks. After catching exception application can exit gracefully or continue execution.
 
 Supports single-threaded and multi-threaded environments.
 
