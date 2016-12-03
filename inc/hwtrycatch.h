@@ -27,10 +27,8 @@ private:
 #endif
 };
 
-#define HW_TRY { ExecutionContext execution_context; if (!setjmp(execution_context.environment))
-#define HW_CATCH() else
-#define HW_FINALLY }
-
-#define HW_THROW() ExecutionContext::throwHwException()
+#define HW_TO_SW_CONVERTER_UNIQUE_NAME(NAME, LINE) NAME ## LINE
+#define HW_TO_SW_CONVERTER_INTERNAL(NAME, LINE) ExecutionContext HW_TO_SW_CONVERTER_UNIQUE_NAME(NAME, LINE); if (setjmp(HW_TO_SW_CONVERTER_UNIQUE_NAME(NAME, LINE).environment)) throw 0
+#define HW_TO_SW_CONVERTER() HW_TO_SW_CONVERTER_INTERNAL(execution_context, __LINE__)
 
 #endif

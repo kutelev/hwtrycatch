@@ -46,30 +46,23 @@ static void raiseUnrecoverableException()
 
 static void exceptionInsideCatch()
 {
-    volatile int i = 0;
-
-    HW_TRY {
-        if (i == 0)
-            raiseRecoverableException();
-    }
-    HW_CATCH() {
-        if (++i == 100)
-            raiseUnrecoverableException();
+    try {
+        HW_TO_SW_CONVERTER();
         raiseRecoverableException();
     }
-    HW_FINALLY {
+    catch(...) {
+        raiseRecoverableException();
     }
 }
 
 static int returnFromCatch()
 {
-    HW_TRY {
+    try {
+        HW_TO_SW_CONVERTER();
         raiseRecoverableException();
     }
-    HW_CATCH() {
+    catch(...) {
         return -1;
-    }
-    HW_FINALLY {
     }
 
     return 0;
@@ -105,22 +98,20 @@ TEST(DeathTest, UnhandledExceptionInsideHwTryHandlingStopped)
     {
         HwExceptionHandler hw_exception_handler;
 
-        HW_TRY {
+        try {
+            HW_TO_SW_CONVERTER();
             raiseRecoverableException();
         }
-        HW_CATCH() {
-        }
-        HW_FINALLY {
+        catch(...) {
         }
 
     }
 
-    HW_TRY {
+    try {
+        HW_TO_SW_CONVERTER();
         EXPECT_DEATH(raiseRecoverableException(), "");
     }
-    HW_CATCH() {
-    }
-    HW_FINALLY {
+    catch(...) {
     }
 }
 
@@ -128,12 +119,11 @@ TEST(DeathTest, UnrecoverableError)
 {
     HwExceptionHandler hw_exception_handler;
 
-    HW_TRY {
+    try {
+        HW_TO_SW_CONVERTER();
         EXPECT_DEATH(raiseUnrecoverableException(), "");
     }
-    HW_CATCH() {
-    }
-    HW_FINALLY {
+    catch(...) {
     }
 }
 
@@ -158,13 +148,12 @@ TEST(DeathTest, AssertInsideTry)
 
     HwExceptionHandler hw_exception_handler;
 
-    HW_TRY {
+    try {
+        HW_TO_SW_CONVERTER();
         EXPECT_DEATH(assert(0), "");
     }
-    HW_CATCH() {
+    catch(...) {
         status = false;
-    }
-    HW_FINALLY{
     }
 
     EXPECT_EQ(status, true);
@@ -176,14 +165,13 @@ TEST(DeathTest, AssertInsideCatch)
 
     HwExceptionHandler hw_exception_handler;
 
-    HW_TRY {
+    try {
+        HW_TO_SW_CONVERTER();
         raiseRecoverableException();
     }
-    HW_CATCH() {
+    catch(...) {
         EXPECT_DEATH(assert(0), "");
         status = false;
-    }
-    HW_FINALLY{
     }
 
     EXPECT_EQ(status, false);
@@ -193,13 +181,12 @@ TEST(SingleThread, ExplicitHwThrow)
 {
     bool status = true;
 
-    HW_TRY {
-        HW_THROW();
+    try {
+        HW_TO_SW_CONVERTER();
+        ExecutionContext::throwHwException();
     }
-    HW_CATCH() {
+    catch(...) {
         status = false;
-    }
-    HW_FINALLY {
     }
 
     EXPECT_EQ(status, false);
@@ -211,13 +198,99 @@ static void singleIteration()
 
     HwExceptionHandler hw_exception_handler;
 
-    HW_TRY {
+    try {
+        HW_TO_SW_CONVERTER();
         raiseRecoverableException();
     }
-    HW_CATCH() {
+    catch(...) {
         status = false;
     }
-    HW_FINALLY {
+
+    EXPECT_EQ(status, false);
+}
+
+static void singleIterationMultipleHandlers()
+{
+    bool status = true;
+
+    HwExceptionHandler hw_exception_handler0;
+    HwExceptionHandler hw_exception_handler1;
+    HwExceptionHandler hw_exception_handler2;
+    HwExceptionHandler hw_exception_handler3;
+    HwExceptionHandler hw_exception_handler4;
+    HwExceptionHandler hw_exception_handler5;
+    HwExceptionHandler hw_exception_handler6;
+    HwExceptionHandler hw_exception_handler7;
+    HwExceptionHandler hw_exception_handler8;
+    HwExceptionHandler hw_exception_handler9;
+
+    try {
+        HW_TO_SW_CONVERTER();
+        raiseRecoverableException();
+    }
+    catch(...) {
+        status = false;
+    }
+
+    EXPECT_EQ(status, false);
+}
+
+static void singleIterationMultipleConverters()
+{
+    bool status = true;
+
+    HwExceptionHandler hw_exception_handler;
+
+    try {
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        raiseRecoverableException();
+    }
+    catch(...) {
+        status = false;
+    }
+
+    EXPECT_EQ(status, false);
+}
+
+static void singleIterationMultipleHandlersAndConverters()
+{
+    bool status = true;
+
+    HwExceptionHandler hw_exception_handler0;
+    HwExceptionHandler hw_exception_handler1;
+    HwExceptionHandler hw_exception_handler2;
+    HwExceptionHandler hw_exception_handler3;
+    HwExceptionHandler hw_exception_handler4;
+    HwExceptionHandler hw_exception_handler5;
+    HwExceptionHandler hw_exception_handler6;
+    HwExceptionHandler hw_exception_handler7;
+    HwExceptionHandler hw_exception_handler8;
+    HwExceptionHandler hw_exception_handler9;
+
+    try {
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        HW_TO_SW_CONVERTER();
+        raiseRecoverableException();
+    }
+    catch(...) {
+        status = false;
     }
 
     EXPECT_EQ(status, false);
@@ -230,13 +303,40 @@ static void multipleIterations()
     for (int i = 0; i < 100; ++i) {
         bool status = true;
 
-        HW_TRY {
+        try {
+            HW_TO_SW_CONVERTER();
             raiseRecoverableException();
         }
-        HW_CATCH() {
+        catch(...) {
             status = false;
         }
-        HW_FINALLY {
+
+        EXPECT_EQ(status, false);
+    }
+}
+
+static void multipleIterationsMultipleConverters()
+{
+    HwExceptionHandler hw_exception_handler;
+
+    for (int i = 0; i < 100; ++i) {
+        bool status = true;
+
+        try {
+            HW_TO_SW_CONVERTER();
+            HW_TO_SW_CONVERTER();
+            HW_TO_SW_CONVERTER();
+            HW_TO_SW_CONVERTER();
+            HW_TO_SW_CONVERTER();
+            HW_TO_SW_CONVERTER();
+            HW_TO_SW_CONVERTER();
+            HW_TO_SW_CONVERTER();
+            HW_TO_SW_CONVERTER();
+            HW_TO_SW_CONVERTER();
+            raiseRecoverableException();
+        }
+        catch(...) {
+            status = false;
         }
 
         EXPECT_EQ(status, false);
@@ -250,13 +350,12 @@ static void multipleIterationsWithReinitialization()
 
         HwExceptionHandler hw_exception_handler;
 
-        HW_TRY {
+        try {
+            HW_TO_SW_CONVERTER();
             raiseRecoverableException();
         }
-        HW_CATCH() {
+        catch(...) {
             status = false;
-        }
-        HW_FINALLY {
         }
 
         EXPECT_EQ(status, false);
@@ -269,9 +368,29 @@ TEST(SingleThread, SingleIteration)
     singleIteration();
 }
 
+TEST(SingleThread, SingleIterationMultipleHandlers)
+{
+    singleIterationMultipleHandlers();
+}
+
+TEST(SingleThread, SingleIterationMultipleConverters)
+{
+    singleIterationMultipleConverters();
+}
+
+TEST(SingleThread, SingleIterationMultipleHandlersAndConverters)
+{
+    singleIterationMultipleHandlersAndConverters();
+}
+
 TEST(SingleThread, MultipleIterations)
 {
     multipleIterations();
+}
+
+TEST(SingleThread, MultipleIterationsMultipleConverters)
+{
+    multipleIterationsMultipleConverters();
 }
 
 TEST(SingleThread, MultipleIterationsWithReinitialization)
@@ -284,17 +403,16 @@ static int nestedTryCatch(int depth, int max_depth, int exception_depth)
     bool status = true;
     volatile int result = depth;
 
-    HW_TRY {
+    try {
+        HW_TO_SW_CONVERTER();
         if (depth == exception_depth)
             raiseRecoverableException();
         if (depth < max_depth)
             result = nestedTryCatch(depth + 1, max_depth, exception_depth);
         raiseRecoverableException();
     }
-    HW_CATCH() {
+    catch(...) {
         status = false;
-    }
-    HW_FINALLY {
     }
 
     EXPECT_EQ(status, false);
@@ -320,7 +438,8 @@ TEST(SingleThread, NestedCppTryCatch)
 
     HwExceptionHandler hw_exception_handler;
 
-    HW_TRY {
+    try {
+        HW_TO_SW_CONVERTER();
         try {
             throw 0;
         }
@@ -328,39 +447,33 @@ TEST(SingleThread, NestedCppTryCatch)
             status_cpp = false;
         }
     }
-    HW_CATCH() {
+    catch(...) {
         status_hw = false;
-    }
-    HW_FINALLY {
     }
 
     EXPECT_EQ(status_hw, true);
     EXPECT_EQ(status_cpp, false);
 }
 
-TEST(SingleThread, TryCatchFinallyCountMatch)
+TEST(SingleThread, TryCatchCountMatch)
 {
     volatile int try_count = 0;
     volatile int catch_count = 0;
-    volatile int finally_count = 0;
 
     HwExceptionHandler hw_exception_handler;
 
     for (int i = 0; i < 100; ++i) {
-        HW_TRY {
+        try {
+            HW_TO_SW_CONVERTER();
             ++try_count;
             raiseRecoverableException();
         }
-        HW_CATCH() {
+        catch(...) {
             ++catch_count;
-        }
-        HW_FINALLY {
-            ++finally_count;
         }
     }
 
     EXPECT_EQ(try_count, catch_count);
-    EXPECT_EQ(try_count, finally_count);
 }
 
 #if !defined(PLATFORM_OS_WINDOWS)
@@ -371,13 +484,12 @@ TEST(SingleThread, StackOverflow)
 
     HwExceptionHandler hw_exception_handler;
 
-    HW_TRY {
+    try {
+        HW_TO_SW_CONVERTER();
         result = infiniteRecursion(100500);
     }
-    HW_CATCH() {
+    catch(...) {
         status = false;
-    }
-    HW_FINALLY {
     }
 
     EXPECT_EQ(status, false);
@@ -392,13 +504,12 @@ TEST(SingleThread, OutputDebugStringA)
 
     HwExceptionHandler hw_exception_handler;
 
-    HW_TRY {
+    try {
+        HW_TO_SW_CONVERTER();
         OutputDebugStringA("Debug message.\n");
     }
-    HW_CATCH() {
+    catch(...) {
         status = false;
-    }
-    HW_FINALLY {
     }
 
     EXPECT_EQ(status, true);
