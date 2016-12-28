@@ -463,7 +463,7 @@ TEST(SingleThread, TryCatchCountMatch)
     EXPECT_EQ(try_count, catch_count);
 }
 
-#if !defined(PLATFORM_OS_WINDOWS)
+#if !defined(PLATFORM_OS_WINDOWS) && !defined(PLATFORM_OS_MAC_OS_X)
 TEST(SingleThread, StackOverflow)
 {
     bool status = true;
