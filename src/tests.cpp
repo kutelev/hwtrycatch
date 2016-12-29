@@ -501,6 +501,32 @@ TEST(SingleThread, OutputDebugStringA)
 
     EXPECT_EQ(status, true);
 }
+
+TEST(SingleThread, CoexistenceWithSeh)
+{
+    bool status = true;
+    int result = 100500;
+
+    auto sehInside = [&result]{
+        __try {
+            raiseRecoverableException();
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            result = 0;
+        }
+    };
+
+    try {
+        HW_TO_SW_CONVERTER();
+        sehInside();
+    }
+    catch(...) {
+        status = false;
+    }
+
+    EXPECT_EQ(status, true);
+    EXPECT_EQ(result, 0);
+}
 #endif
 
 TEST(MultiThread, SingleIteration)
