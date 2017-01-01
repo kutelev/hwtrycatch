@@ -1,10 +1,17 @@
 version: 0.0.{build}
 build_script:
-- cmd: >-
+- cmd: |
     git clone --branch release-1.8.0 --depth 1 https://github.com/google/googletest.git
-
-    cmake .
-
+    mkdir x86
+    mkdir x64
+    cd x86
+    cmake -G "Visual Studio 14 2015" ..
     cmake --build . --config Release
+    cd ..\x64
+    cmake -G "Visual Studio 14 2015 Win64" ..
+    cmake --build . --config Release
+    cd ..
 test_script:
-- cmd: .\Release\hwtrycatch_tests.exe
+- cmd: |
+    .\x86\Release\hwtrycatch_tests.exe
+    .\x64\Release\hwtrycatch_tests.exe
