@@ -55,11 +55,12 @@ class Connection:
             print('Up to date (skipping): {}'.format(file_name))
             return
 
-        try:
-            self.sftp.remove(dst_file_name)
-            print('Remove remote file {}'.format(dst_file_name))
-        except FileNotFoundError:
-            pass
+        if self.path_exists(dst_file_name):
+            try:
+                self.sftp.remove(dst_file_name)
+                print('Remove remote file {}'.format(dst_file_name))
+            except FileNotFoundError:
+                pass
 
         print('Put {} to {}'.format(file_name, dst_file_name))
         start_time = time.clock()
