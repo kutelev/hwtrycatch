@@ -1,6 +1,7 @@
 language: cpp
 
 install:
+- if [[ "$PLATFORM" == "linux" ]]; then sudo apt-get install -y g++-multilib; fi
 - if [[ "$PLATFORM" == "android" ]]; then wget -q http://dl.google.com/android/ndk/android-ndk-r10d-linux-x86_64.bin -O /tmp/android-ndk-r10d-linux-x86_64.bin && chmod +x /tmp/android-ndk-r10d-linux-x86_64.bin && /tmp/android-ndk-r10d-linux-x86_64.bin > /dev/null && rm /tmp/android-ndk-r10d-linux-x86_64.bin; fi
 - if [[ "$PLATFORM" == "android" ]]; then python -m pip install paramiko; fi
 
@@ -8,20 +9,34 @@ script:
 - git clone --branch release-1.8.0 --depth 1 https://github.com/google/googletest.git
 - if [[ "$PLATFORM" == "android" ]]; then git clone --depth 1 https://github.com/taka-no-me/android-cmake.git || travis_terminate 1; fi
 - if [[ "$PLATFORM" == "ios" ]]; then git clone --depth 1 https://github.com/ollef/ios-cmake.git || travis_terminate 1; fi
-- if [[ "$PLATFORM" == "linux" ]] || [[ "$PLATFORM" == "macos" ]]; then cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 . || travis_terminate 1; fi
+- 'if [[ "$PLATFORM" == "linux" ]]; then
+      mkdir {x86,x64};
+      cd x86;
+      cmake -DARCH32=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 .. || travis_terminate 1;
+      cmake --build . --config Release;
+      cd ../x64;
+      cmake -DARCH32=0 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 .. || travis_terminate 1;
+      cmake --build . --config Release;
+      cd ..;
+  fi'
+- if [[ "$PLATFORM" == "macos" ]]; then cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 . || travis_terminate 1; fi
 - if [[ "$PLATFORM" == "android" ]]; then cmake -DANDROID_NDK=./android-ndk-r10d -DCMAKE_TOOLCHAIN_FILE=./android-cmake/android.toolchain.cmake -DANDROID_ABI="armeabi-v7a with NEON" -DANDROID_NATIVE_API_LEVEL=android-16 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 . || travis_terminate 1; fi
 - if [[ "$PLATFORM" == "ios" ]]; then cmake -DCMAKE_TOOLCHAIN_FILE=./ios-cmake/toolchain/iOS.cmake -DIOS_DEPLOYMENT_TARGET=5.0 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 . || travis_terminate 1; fi
-- cmake --build . --config Release
+- if [[ "$PLATFORM" == "macos" ]] || [[ "$PLATFORM" == "android" ]] || [[ "$PLATFORM" == "ios" ]]; then cmake --build . --config Release || travis_terminate 1; fi
 
 after_success:
-- if [[ "$PLATFORM" == "linux" ]] || [[ "$PLATFORM" == "macos" ]]; then ./hwtrycatch_tests || travis_terminate 1; fi
+- 'if [[ "$PLATFORM" == "linux" ]]; then
+      ./x86/hwtrycatch_tests || travis_terminate 1;
+      ./x64/hwtrycatch_tests || travis_terminate 1;
+  fi'
+- if [[ "$PLATFORM" == "macos" ]]; then ./hwtrycatch_tests || travis_terminate 1; fi
 - if [[ "$PLATFORM" == "android" ]]; then python ./tests/tests_android.py "$ANDROID_IP" "$ANDROID_PORT" "$ANDROID_USERNAME" "$ANDROID_PASSWORD" || travis_terminate 1; fi
 
 matrix:
     include:
         - os: linux
           dist: trusty
-          sudo: false
+          sudo: required
           env: PLATFORM=linux
         - os: linux
           dist: trusty
