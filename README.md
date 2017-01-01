@@ -20,10 +20,11 @@ All major desktop operating systems are supported:
 Supported mobile platforms:
 
 * Android
+* iOS
 
 ## Automatically tested with ##
 
-* GCC 4.8 on Ubuntu 12.04 LTS (Precise Pangolin)
+* GCC 4.8 on Ubuntu 14.04 LTS (Trusty Tahr)
 * Visual Studio 2015 on Windows
 * Xcode 8 on Mac OS X 10.11 (El Capitan)
 
