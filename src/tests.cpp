@@ -77,6 +77,7 @@ static int infiniteRecursion(int arg)
 }
 #endif
 
+#if !defined(PLATFORM_OS_IOS)
 TEST(DeathTest, UnhandledExceptionHandlingNotStarted)
 {
     EXPECT_DEATH(raiseRecoverableException(), "");
@@ -178,6 +179,7 @@ TEST(DeathTest, AssertInsideCatch)
 
     EXPECT_EQ(status, false);
 }
+#endif
 
 static void singleIteration()
 {
@@ -463,7 +465,7 @@ TEST(SingleThread, TryCatchCountMatch)
     EXPECT_EQ(try_count, catch_count);
 }
 
-#if !defined(PLATFORM_OS_WINDOWS) && !defined(PLATFORM_OS_MAC_OS_X)
+#if !defined(PLATFORM_OS_WINDOWS) && !defined(PLATFORM_OS_MAC_OS_X) && !defined(PLATFORM_OS_IOS)
 TEST(SingleThread, StackOverflow)
 {
     bool status = true;

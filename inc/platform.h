@@ -21,10 +21,12 @@
 #define PLATFORM_OS_LINUX
 #elif defined(_WIN32) || defined(_WIN64)
 #define PLATFORM_OS_WINDOWS
+#elif defined(__APPLE__) && TARGET_OS_IPHONE == 1
+#define PLATFORM_OS_IOS
 #elif defined(__APPLE__) && TARGET_OS_MAC == 1
 #define PLATFORM_OS_MAC_OS_X
 #else
-#error "Unsupported OS. Supported operating systems are: Windows, Linux, Mac OS X, Android"
+#error "Unsupported OS. Supported operating systems are: Windows, Linux, Mac OS X, Android, iOS"
 #endif
 
 #if defined(PLATFORM_OS_WINDOWS) && !defined(PLATFORM_COMPILER_MSVC)
