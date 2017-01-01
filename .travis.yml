@@ -7,8 +7,10 @@ install:
 script:
 - git clone --branch release-1.8.0 --depth 1 https://github.com/google/googletest.git
 - if [[ "$PLATFORM" == "android" ]]; then git clone --depth 1 https://github.com/taka-no-me/android-cmake.git || travis_terminate 1; fi
+- if [[ "$PLATFORM" == "ios" ]]; then git clone --depth 1 https://github.com/ollef/ios-cmake.git || travis_terminate 1; fi
 - if [[ "$PLATFORM" == "linux" ]] || [[ "$PLATFORM" == "macos" ]]; then cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 . || travis_terminate 1; fi
 - if [[ "$PLATFORM" == "android" ]]; then cmake -DANDROID_NDK=./android-ndk-r10d -DCMAKE_TOOLCHAIN_FILE=./android-cmake/android.toolchain.cmake -DANDROID_ABI="armeabi-v7a with NEON" -DANDROID_NATIVE_API_LEVEL=android-16 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 . || travis_terminate 1; fi
+- if [[ "$PLATFORM" == "ios" ]]; then cmake -DCMAKE_TOOLCHAIN_FILE=./ios-cmake/toolchain/iOS.cmake -DIOS_DEPLOYMENT_TARGET=5.0 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 . || travis_terminate 1; fi
 - cmake --build . --config Release
 
 after_success:
@@ -28,3 +30,6 @@ matrix:
         - os: osx
           osx_image: xcode8
           env: PLATFORM=macos
+        - os: osx
+          osx_image: xcode8
+          env: PLATFORM=ios
