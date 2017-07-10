@@ -6,6 +6,7 @@
 #include "platform.h"
 
 #if defined(PLATFORM_OS_WINDOWS)
+#include <cassert>
 #include <excpt.h>
 #include <windows.h>
 #else
@@ -79,8 +80,10 @@ struct ExecutionContextStruct {
 static LONG WINAPI vectoredExceptionHandler(struct _EXCEPTION_POINTERS *_exception_info)
 {
     if (!execution_context ||
-        _exception_info->ExceptionRecord->ExceptionCode == DBG_PRINTEXCEPTION_C ||
-        _exception_info->ExceptionRecord->ExceptionCode == 0xE06D7363L /* C++ exception */
+        (_exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION &&
+        _exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_ILLEGAL_INSTRUCTION &&
+        _exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_INT_DIVIDE_BY_ZERO &&
+        _exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_STACK_OVERFLOW)
     )
         return EXCEPTION_CONTINUE_SEARCH;
 
@@ -175,7 +178,7 @@ HwExceptionHandler::~HwExceptionHandler()
 #endif
 }
 
-const char * ExecutionContext::humanReadableName() const
+const char* ExecutionContext::humanReadableName() const
 {
 #if defined(PLATFORM_OS_WINDOWS)
     switch (exception_type) {
@@ -188,7 +191,8 @@ const char * ExecutionContext::humanReadableName() const
         case EXCEPTION_STACK_OVERFLOW:
             return "Stack overflow";
         default:
-            return "Unknown exception";
+            assert(0);
+            return nullptr;
     }
 #else
     return strsignal(exception_type);
