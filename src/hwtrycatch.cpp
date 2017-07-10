@@ -135,11 +135,15 @@ HwExceptionHandler::HwExceptionHandler()
     exception_handler_handle = AddVectoredExceptionHandler(1, vectoredExceptionHandler);
 #else
 
-    stack_t ss;
-    ss.ss_sp = exception_handler_stack;
-    ss.ss_flags = 0;
-    ss.ss_size = SIGSTKSZ;
-    sigaltstack(&ss, 0);
+    static std::once_flag once_flag;
+
+    std::call_once(once_flag,[]{
+        stack_t ss;
+        ss.ss_sp = exception_handler_stack;
+        ss.ss_flags = 0;
+        ss.ss_size = SIGSTKSZ;
+        sigaltstack(&ss, 0);
+    });
 
     struct sigaction sa;
     sigemptyset(&sa.sa_mask);

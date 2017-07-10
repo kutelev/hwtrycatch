@@ -553,7 +553,6 @@ TEST(MultiThread, MultipleIterations)
         threads[i].join();
 }
 
-#if 0
 TEST(MultiThread, MultipleIterationsWithReinitialization)
 {
     std::thread threads[100];
@@ -564,4 +563,3 @@ TEST(MultiThread, MultipleIterationsWithReinitialization)
     for (int i = 0; i < 100; ++i)
         threads[i].join();
 }
-#endif
