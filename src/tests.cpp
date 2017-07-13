@@ -30,7 +30,7 @@ static int raiseRecoverableException()
     int result = 0;
     for (long long int i = 0; result != 100500; ++i)
         result = (result + tiny_array[i]) / tiny_array[i];
-    char * invalid_pointer = 0;
+    char* invalid_pointer = 0;
     invalid_pointer[0] = 0;
     return result * tiny_array[0];
 }
@@ -436,7 +436,7 @@ TEST(SingleThread, NestedCppTryCatch)
             status_cpp = false;
         }
     }
-    catch(const HwException &) {
+    catch(const HwException&) {
         status_hw = false;
     }
 

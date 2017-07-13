@@ -17,7 +17,7 @@
 namespace hwtrycatch {
 
 #if defined(PLATFORM_OS_WINDOWS)
-static thread_local ExecutionContext * execution_context = nullptr;
+static thread_local ExecutionContext* execution_context = nullptr;
 #else
 template <typename T>
 class ThreadLocal final {
@@ -68,7 +68,7 @@ ExecutionContext::~ExecutionContext()
 
 struct ExecutionContextStruct {
     jmp_buf environment;
-    ExecutionContext * prev_context;
+    ExecutionContext* prev_context;
 #if defined(PLATFORM_OS_WINDOWS)
     bool dirty;
 #endif
@@ -77,7 +77,7 @@ struct ExecutionContextStruct {
 
 #if defined(PLATFORM_OS_WINDOWS)
 
-static LONG WINAPI vectoredExceptionHandler(struct _EXCEPTION_POINTERS *_exception_info)
+static LONG WINAPI vectoredExceptionHandler(struct _EXCEPTION_POINTERS* _exception_info)
 {
     if (!execution_context ||
         (_exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION &&
@@ -87,8 +87,8 @@ static LONG WINAPI vectoredExceptionHandler(struct _EXCEPTION_POINTERS *_excepti
     )
         return EXCEPTION_CONTINUE_SEARCH;
 
-    reinterpret_cast<ExecutionContextStruct *>(static_cast<ExecutionContext *>(execution_context))->dirty = true;
-    reinterpret_cast<ExecutionContextStruct *>(static_cast<ExecutionContext *>(execution_context))->exception_type = _exception_info->ExceptionRecord->ExceptionCode;
+    reinterpret_cast<ExecutionContextStruct*>(static_cast<ExecutionContext*>(execution_context))->dirty = true;
+    reinterpret_cast<ExecutionContextStruct*>(static_cast<ExecutionContext*>(execution_context))->exception_type = _exception_info->ExceptionRecord->ExceptionCode;
     longjmp(execution_context->environment, 0);
 }
 
@@ -113,7 +113,7 @@ static void signalHandler(int signum)
         sigemptyset(&signals);
         sigaddset(&signals, signum);
         sigprocmask(SIG_UNBLOCK, &signals, NULL);
-        reinterpret_cast<ExecutionContextStruct *>(static_cast<ExecutionContext *>(execution_context))->exception_type = signum;
+        reinterpret_cast<ExecutionContextStruct*>(static_cast<ExecutionContext*>(execution_context))->exception_type = signum;
         longjmp(execution_context->environment, 0);
     }
     else if (prev_handlers[signum - MIN_SIGNUM].sa_handler) {
