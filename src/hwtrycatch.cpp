@@ -42,7 +42,7 @@ private:
 static ThreadLocal<ExecutionContext> execution_context;
 #endif
 
-static std::atomic<int> user_count(0);
+static int user_count = 0;
 static std::mutex mutex;
 
 #if defined(PLATFORM_OS_WINDOWS)
@@ -131,7 +131,7 @@ HwExceptionHandler::HwExceptionHandler()
 {
     std::lock_guard<std::mutex> lock(mutex);
 
-    if (++user_count != 1)
+    if (user_count++ != 0)
         return;
 
 #if defined(PLATFORM_OS_WINDOWS)
