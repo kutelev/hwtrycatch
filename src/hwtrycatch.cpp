@@ -19,7 +19,7 @@ namespace hwtrycatch {
 #if defined(PLATFORM_OS_WINDOWS)
 static thread_local ExecutionContext* execution_context = nullptr;
 #else
-template <typename T>
+template<typename T>
 class ThreadLocal final {
 public:
     ThreadLocal() { pthread_key_create(&key, NULL); }
@@ -49,7 +49,8 @@ static std::mutex mutex;
 static PVOID exception_handler_handle = 0;
 #endif
 
-ExecutionContext::ExecutionContext() : prev_context(execution_context)
+ExecutionContext::ExecutionContext()
+    : prev_context(execution_context)
 {
 #if defined(PLATFORM_OS_WINDOWS)
     dirty = false;
@@ -79,16 +80,15 @@ struct ExecutionContextStruct {
 
 static LONG WINAPI vectoredExceptionHandler(struct _EXCEPTION_POINTERS* _exception_info)
 {
-    if (!execution_context ||
-        (_exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION &&
-        _exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_ILLEGAL_INSTRUCTION &&
-        _exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_INT_DIVIDE_BY_ZERO &&
-        _exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_STACK_OVERFLOW)
-    )
+    if (!execution_context || (_exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION &&
+                               _exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_ILLEGAL_INSTRUCTION &&
+                               _exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_INT_DIVIDE_BY_ZERO &&
+                               _exception_info->ExceptionRecord->ExceptionCode != EXCEPTION_STACK_OVERFLOW))
         return EXCEPTION_CONTINUE_SEARCH;
 
     reinterpret_cast<ExecutionContextStruct*>(static_cast<ExecutionContext*>(execution_context))->dirty = true;
-    reinterpret_cast<ExecutionContextStruct*>(static_cast<ExecutionContext*>(execution_context))->exception_type = _exception_info->ExceptionRecord->ExceptionCode;
+    reinterpret_cast<ExecutionContextStruct*>(static_cast<ExecutionContext*>(execution_context))->exception_type =
+        _exception_info->ExceptionRecord->ExceptionCode;
     longjmp(execution_context->environment, 0);
 }
 
@@ -140,7 +140,7 @@ HwExceptionHandler::HwExceptionHandler()
 
     static std::once_flag once_flag;
 
-    std::call_once(once_flag,[]{
+    std::call_once(once_flag, [] {
         stack_t ss;
         ss.ss_sp = exception_handler_stack;
         ss.ss_flags = 0;
@@ -198,5 +198,4 @@ const char* ExecutionContext::humanReadableName() const
     return strsignal(exception_type);
 #endif
 }
-
 }

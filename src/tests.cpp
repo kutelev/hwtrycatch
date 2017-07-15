@@ -13,20 +13,20 @@
 #include <src/gmock-all.cc>
 #include <src/gtest-all.cc>
 
-#include "platform.h"
 #include "hwtrycatch.h"
+#include "platform.h"
 
 using namespace hwtrycatch;
 
-GTEST_API_ int main (int argc, char** argv)
+GTEST_API_ int main(int argc, char** argv)
 {
-    testing::InitGoogleMock (&argc, argv);
+    testing::InitGoogleMock(&argc, argv);
     return RUN_ALL_TESTS();
 }
 
 static int raiseRecoverableException()
 {
-    static char tiny_array[4] = {0, 1, 2, 3};
+    static char tiny_array[4] = { 0, 1, 2, 3 };
     int result = 0;
     for (long long int i = 0; result != 100500; ++i)
         result = (result + tiny_array[i]) / tiny_array[i];
@@ -52,7 +52,7 @@ static void exceptionInsideCatch()
         HW_TO_SW_CONVERTER();
         raiseRecoverableException();
     }
-    catch(...) {
+    catch (...) {
         raiseRecoverableException();
     }
 }
@@ -63,7 +63,7 @@ static int returnFromCatch()
         HW_TO_SW_CONVERTER();
         raiseRecoverableException();
     }
-    catch(...) {
+    catch (...) {
         return -1;
     }
 
@@ -92,7 +92,9 @@ TEST(DeathTest, UnhandledExceptionHandlingStarted)
 
 TEST(DeathTest, UnhandledExceptionHandlingStopped)
 {
-    { HwExceptionHandler hw_exception_handler; }
+    {
+        HwExceptionHandler hw_exception_handler;
+    }
     EXPECT_DEATH(raiseRecoverableException(), "");
 }
 
@@ -105,16 +107,15 @@ TEST(DeathTest, UnhandledExceptionInsideHwTryHandlingStopped)
             HW_TO_SW_CONVERTER();
             raiseRecoverableException();
         }
-        catch(...) {
+        catch (...) {
         }
-
     }
 
     try {
         HW_TO_SW_CONVERTER();
         EXPECT_DEATH(raiseRecoverableException(), "");
     }
-    catch(...) {
+    catch (...) {
     }
 }
 
@@ -126,7 +127,7 @@ TEST(DeathTest, UnrecoverableError)
         HW_TO_SW_CONVERTER();
         EXPECT_DEATH(raiseUnrecoverableException(), "");
     }
-    catch(...) {
+    catch (...) {
     }
 }
 
@@ -155,7 +156,7 @@ TEST(DeathTest, AssertInsideTry)
         HW_TO_SW_CONVERTER();
         EXPECT_DEATH(assert(0), "");
     }
-    catch(...) {
+    catch (...) {
         status = false;
     }
 
@@ -172,7 +173,7 @@ TEST(DeathTest, AssertInsideCatch)
         HW_TO_SW_CONVERTER();
         raiseRecoverableException();
     }
-    catch(...) {
+    catch (...) {
         EXPECT_DEATH(assert(0), "");
         status = false;
     }
@@ -191,7 +192,7 @@ static void singleIteration()
         HW_TO_SW_CONVERTER();
         raiseRecoverableException();
     }
-    catch(...) {
+    catch (...) {
         status = false;
     }
 
@@ -217,7 +218,7 @@ static void singleIterationMultipleHandlers()
         HW_TO_SW_CONVERTER();
         raiseRecoverableException();
     }
-    catch(...) {
+    catch (...) {
         status = false;
     }
 
@@ -243,7 +244,7 @@ static void singleIterationMultipleConverters()
         HW_TO_SW_CONVERTER();
         raiseRecoverableException();
     }
-    catch(...) {
+    catch (...) {
         status = false;
     }
 
@@ -278,7 +279,7 @@ static void singleIterationMultipleHandlersAndConverters()
         HW_TO_SW_CONVERTER();
         raiseRecoverableException();
     }
-    catch(...) {
+    catch (...) {
         status = false;
     }
 
@@ -296,7 +297,7 @@ static void multipleIterations()
             HW_TO_SW_CONVERTER();
             raiseRecoverableException();
         }
-        catch(...) {
+        catch (...) {
             status = false;
         }
 
@@ -324,7 +325,7 @@ static void multipleIterationsMultipleConverters()
             HW_TO_SW_CONVERTER();
             raiseRecoverableException();
         }
-        catch(...) {
+        catch (...) {
             status = false;
         }
 
@@ -343,14 +344,13 @@ static void multipleIterationsWithReinitialization()
             HW_TO_SW_CONVERTER();
             raiseRecoverableException();
         }
-        catch(...) {
+        catch (...) {
             status = false;
         }
 
         EXPECT_EQ(status, false);
     }
 }
-
 
 TEST(SingleThread, SingleIteration)
 {
@@ -400,7 +400,7 @@ static int nestedTryCatch(int depth, int max_depth, int exception_depth)
             result = nestedTryCatch(depth + 1, max_depth, exception_depth);
         raiseRecoverableException();
     }
-    catch(...) {
+    catch (...) {
         status = false;
     }
 
@@ -436,7 +436,7 @@ TEST(SingleThread, NestedCppTryCatch)
             status_cpp = false;
         }
     }
-    catch(const HwException&) {
+    catch (const HwException&) {
         status_hw = false;
     }
 
@@ -457,7 +457,7 @@ TEST(SingleThread, TryCatchCountMatch)
             ++try_count;
             raiseRecoverableException();
         }
-        catch(...) {
+        catch (...) {
             ++catch_count;
         }
     }
@@ -477,7 +477,7 @@ TEST(SingleThread, StackOverflow)
         HW_TO_SW_CONVERTER();
         result = infiniteRecursion(100500);
     }
-    catch(...) {
+    catch (...) {
         status = false;
     }
 
@@ -497,7 +497,7 @@ TEST(SingleThread, OutputDebugStringA)
         HW_TO_SW_CONVERTER();
         OutputDebugStringA("Debug message.\n");
     }
-    catch(...) {
+    catch (...) {
         status = false;
     }
 
@@ -509,11 +509,11 @@ TEST(SingleThread, CoexistenceWithSeh)
     bool status = true;
     int result = 100500;
 
-    auto sehInside = [&result]{
+    auto sehInside = [&result] {
         __try {
             raiseRecoverableException();
         }
-        __except(EXCEPTION_EXECUTE_HANDLER) {
+        __except (EXCEPTION_EXECUTE_HANDLER) {
             result = 0;
         }
     };
@@ -522,7 +522,7 @@ TEST(SingleThread, CoexistenceWithSeh)
         HW_TO_SW_CONVERTER();
         sehInside();
     }
-    catch(...) {
+    catch (...) {
         status = false;
     }
 
