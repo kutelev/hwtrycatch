@@ -42,10 +42,10 @@ public:
 
 #define HW_TO_SW_CONVERTER_UNIQUE_NAME(NAME, LINE) NAME##LINE
 
-#define HW_TO_SW_CONVERTER_INTERNAL(NAME, LINE)                         \
-    ExecutionContext HW_TO_SW_CONVERTER_UNIQUE_NAME(NAME, LINE);        \
-    if (setjmp(HW_TO_SW_CONVERTER_UNIQUE_NAME(NAME, LINE).environment)) \
-    throw HwException(HW_TO_SW_CONVERTER_UNIQUE_NAME(NAME, LINE))
+#define HW_TO_SW_CONVERTER_INTERNAL(NAME, LINE)                              \
+    hwtrycatch::ExecutionContext HW_TO_SW_CONVERTER_UNIQUE_NAME(NAME, LINE); \
+    if (setjmp(HW_TO_SW_CONVERTER_UNIQUE_NAME(NAME, LINE).environment))      \
+    throw hwtrycatch::HwException(HW_TO_SW_CONVERTER_UNIQUE_NAME(NAME, LINE))
 
 #define HW_TO_SW_CONVERTER() HW_TO_SW_CONVERTER_INTERNAL(execution_context, __LINE__)
 }
