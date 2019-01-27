@@ -1,9 +1,12 @@
 language: cpp
 
 script:
-- git clone --branch release-1.8.1 --depth 1 https://github.com/google/googletest.git
-- cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 .
-- cmake --build . --config Release
+  - git clone --branch release-1.8.1 --depth 1 https://github.com/google/googletest.git
+  - if [[ "$TRAVIS_OS_NAME" == "linux" || "$TRAVIS_OS_NAME" == "osx" ]]; then cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 -G "Unix Makefiles" .; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cmake -DCMAKE_VERBOSE_MAKEFILE=1 -G "Visual Studio 15 2017 Win64" .; fi
+  - cmake --build . --config Release
+  - if [[ "$TRAVIS_OS_NAME" == "linux" || "$TRAVIS_OS_NAME" == "osx" ]]; then ./hwtrycatch_tests; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then ./Release/hwtrycatch_tests.exe; fi
 
 after_success:
 - ./hwtrycatch_tests
@@ -28,3 +31,4 @@ matrix:
       osx_image: xcode10
     - os: osx
       osx_image: xcode10.1
+    - os: windows
