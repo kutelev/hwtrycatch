@@ -61,9 +61,13 @@ ExecutionContext::ExecutionContext()
 ExecutionContext::~ExecutionContext()
 {
 #if defined(PLATFORM_OS_WINDOWS)
+    if (execution_context != this)
+        return;
+
     if (execution_context->dirty)
         RemoveVectoredExceptionHandler(exception_handler_handle);
 #endif
+
     execution_context = execution_context->prev_context;
 }
 

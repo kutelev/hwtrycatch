@@ -35,12 +35,17 @@ static int raiseRecoverableException()
     return result * tiny_array[0];
 }
 
+#if defined(PLATFORM_OS_WINDOWS)
+static void raiseUnrecoverableException();
+static void raiseUnrecoverableException2() { raiseUnrecoverableException(); }
+#endif
+
 static void raiseUnrecoverableException()
 {
 #if defined(PLATFORM_OS_WINDOWS)
     char tiny_array[4];
-    memset(tiny_array, 0, std::numeric_limits<size_t>::max());
-    raiseUnrecoverableException();
+    memset(tiny_array - 128, 0, 256);
+    raiseUnrecoverableException2();
 #else
     main(0, 0);
 #endif
