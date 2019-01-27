@@ -1,6 +1,6 @@
 # hwtrycatch
 
-[![Build status](https://ci.appveyor.com/api/projects/status/t1h7qk5g2kvc9xwp/branch/master?svg=true)](https://ci.appveyor.com/project/kutelev/hwtrycatch/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/cvvfms6c48opx2j0?svg=true)](https://ci.appveyor.com/project/kutelev/hwtrycatch)
 [![Build Status](https://travis-ci.org/kutelev/hwtrycatch.svg?branch=master)](https://travis-ci.org/kutelev/hwtrycatch)
 
 ## Description ##
@@ -17,16 +17,27 @@ All major desktop operating systems are supported:
 * Windows
 * Mac OS X
 
-Supported mobile platforms:
+Following mobile platforms supposed to work but test are not run:
 
 * Android
 * iOS
 
-## Automatically tested with ##
+## Automatically tested on ##
 
-* GCC 4.8 on Ubuntu 14.04 LTS (Trusty Tahr)
-* Visual Studio 2015 on Windows
-* Xcode 8 on Mac OS X 10.11 (El Capitan)
+Linux:
+* GCC 4.8.x on Ubuntu 14.04 LTS
+* GCC 5.4.x on Ubuntu 16.04 LTS
+
+Windows:
+* Visual Studio 2015
+
+macOS:
+* Xcode 8
+* Xcode 8.3
+* Xcode 9
+* Xcode 9.4
+* Xcode 10
+* Xcode 10.1
 
 ## Exceptions which can be caught ##
 
