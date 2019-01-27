@@ -30,6 +30,7 @@ Linux:
 
 Windows:
 * Visual Studio 2015
+* Visual Studio 2017
 
 macOS:
 * Xcode 8

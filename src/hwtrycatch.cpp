@@ -61,13 +61,14 @@ ExecutionContext::ExecutionContext()
 ExecutionContext::~ExecutionContext()
 {
 #if defined(PLATFORM_OS_WINDOWS)
+    // This Windows-specifc fragment of code is pure magic.
+    // Do not try to find a reasonable justification of existence of this code.
+    // But believe that some tests will fail if this magic code is removed.
     if (execution_context != this)
         return;
-
     if (execution_context->dirty)
         RemoveVectoredExceptionHandler(exception_handler_handle);
 #endif
-
     execution_context = execution_context->prev_context;
 }
 

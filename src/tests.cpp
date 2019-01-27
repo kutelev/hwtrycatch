@@ -37,7 +37,10 @@ static int raiseRecoverableException()
 
 #if defined(PLATFORM_OS_WINDOWS)
 static void raiseUnrecoverableException();
-static void raiseUnrecoverableException2() { raiseUnrecoverableException(); }
+static void raiseUnrecoverableException2()
+{
+    raiseUnrecoverableException();
+}
 #endif
 
 static void raiseUnrecoverableException()
@@ -82,7 +85,6 @@ static int infiniteRecursion(int arg)
 }
 #endif
 
-#if !defined(PLATFORM_OS_IOS)
 TEST(DeathTest, UnhandledExceptionHandlingNotStarted)
 {
     EXPECT_DEATH(raiseRecoverableException(), "");
@@ -185,7 +187,6 @@ TEST(DeathTest, AssertInsideCatch)
 
     EXPECT_EQ(status, false);
 }
-#endif
 
 static void singleIteration()
 {
@@ -470,7 +471,7 @@ TEST(SingleThread, TryCatchCountMatch)
     EXPECT_EQ(try_count, catch_count);
 }
 
-#if !defined(PLATFORM_OS_WINDOWS) && !defined(PLATFORM_OS_MAC_OS_X) && !defined(PLATFORM_OS_IOS)
+#if defined(PLATFORM_OS_LINUX)
 TEST(SingleThread, StackOverflow)
 {
     bool status = true;
