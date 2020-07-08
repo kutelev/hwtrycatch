@@ -20,16 +20,16 @@ public:
     ExecutionContext();
     ~ExecutionContext();
 
-    jmp_buf environment;
+    jmp_buf environment{};
 
 private:
     const char* humanReadableName() const;
 
     ExecutionContext* prev_context;
 #if defined(PLATFORM_OS_WINDOWS)
-    bool dirty;
+    bool dirty{};
 #endif
-    int exception_type;
+    int exception_type{};
 };
 
 class HwException final : public std::runtime_error {

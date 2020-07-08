@@ -46,22 +46,19 @@ static int user_count = 0;
 static std::mutex mutex;
 
 #if defined(PLATFORM_OS_WINDOWS)
-static PVOID exception_handler_handle = 0;
+static PVOID exception_handler_handle = nullptr;
 #endif
 
 ExecutionContext::ExecutionContext()
     : prev_context(execution_context)
 {
-#if defined(PLATFORM_OS_WINDOWS)
-    dirty = false;
-#endif
     execution_context = this;
 }
 
 ExecutionContext::~ExecutionContext()
 {
 #if defined(PLATFORM_OS_WINDOWS)
-    // This Windows-specifc fragment of code is pure magic.
+    // This Windows-specific fragment of code is pure magic.
     // Do not try to find a reasonable justification of existence of this code.
     // But believe that some tests will fail if this magic code is removed.
     if (execution_context != this)
@@ -172,7 +169,7 @@ HwExceptionHandler::~HwExceptionHandler()
 
 #if defined(PLATFORM_OS_WINDOWS)
     RemoveVectoredExceptionHandler(exception_handler_handle);
-    exception_handler_handle = 0;
+    exception_handler_handle = nullptr;
 #else
     for (int signum : handled_signals) {
         if (prev_handlers[signum - MIN_SIGNUM].sa_handler)

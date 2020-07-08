@@ -17,7 +17,7 @@ All major desktop operating systems are supported:
 * Windows
 * Mac OS X
 
-Following mobile platforms supposed to work but test are not run:
+Following mobile platforms are supposed to work but tests are not run:
 
 * Android
 * iOS
