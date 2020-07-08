@@ -30,12 +30,20 @@ stages:
     - .prepare_centos
     - .test
 
+test:debian:8:
+  image: debian:8
+  extends: .test_on_debian
+
 test:debian:9:
   image: debian:9
   extends: .test_on_debian
 
 test:debian:10:
   image: debian:10
+  extends: .test_on_debian
+
+test:ubuntu:14.04:
+  image: ubuntu:14.04
   extends: .test_on_debian
 
 test:ubuntu:16.04:
@@ -49,6 +57,10 @@ test:ubuntu:18.04:
 test:ubuntu:20.04:
   image: ubuntu:20.04
   extends: .test_on_debian
+
+test:centos:7:
+  image: centos:7
+  extends: .test_on_centos
 
 test:centos:8:
   image: centos:8
