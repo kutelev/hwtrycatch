@@ -1,6 +1,6 @@
 build_script:
 - cmd: |
-    git clone --branch release-1.8.1 --depth 1 https://github.com/google/googletest.git
+    git clone --branch release-1.10.0 --depth 1 https://github.com/google/googletest.git
     cmake -G "Visual Studio 14 2015 Win64" .
     cmake --build . --config Release
 
