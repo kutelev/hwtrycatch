@@ -6,6 +6,11 @@ stages:
     - apt-get update && apt-get upgrade -y
     - apt-get install -y git g++ make cmake
 
+.prepare_centos:
+  before_script:
+    - yum -y update && yum -y upgrade
+    - yum install -y git gcc-c++ make cmake
+
 .test:
   script:
     - git clone --branch release-1.10.0 --depth 1 https://github.com/google/googletest.git
@@ -18,6 +23,11 @@ stages:
     DEBIAN_FRONTEND: noninteractive
   extends:
     - .prepare_debian
+    - .test
+
+.test_on_centos:
+  extends:
+    - .prepare_centos
     - .test
 
 test:debian:9:
@@ -39,3 +49,7 @@ test:ubuntu:18.04:
 test:ubuntu:20.04:
   image: ubuntu:20.04
   extends: .test_on_debian
+
+test:centos:8:
+  image: centos:8
+  extends: .test_on_centos
