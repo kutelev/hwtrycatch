@@ -18,28 +18,36 @@ All major desktop operating systems are supported:
 * Windows
 * Mac OS X
 
-Following mobile platforms are supposed to work but tests are not run:
-
-* Android
-* iOS
-
 ## Automatically tested on ##
 
 Linux:
+* GCC 4.9.x on Debian 8
+* GCC 6.3.x on Debian 9
+* GCC 8.3.x on Debian 10
+
 * GCC 4.8.x on Ubuntu 14.04 LTS
 * GCC 5.4.x on Ubuntu 16.04 LTS
+* GCC 7.5.x on Ubuntu 18.04 LTS
+* GCC 9.3.x on Ubuntu 20.04 LTS
+
+* GCC 4.8.x on CentOS 7
+* GCC 8.3.x on CentOS 8
 
 Windows:
 * Visual Studio 2015
 * Visual Studio 2017
+* Visual Studio 2019
 
 macOS:
-* Xcode 8
+* Xcode 8.0
 * Xcode 8.3
-* Xcode 9
+* Xcode 9.0
 * Xcode 9.4
-* Xcode 10
-* Xcode 10.1
+* Xcode 10.0
+* Xcode 10.3
+* Xcode 11.0
+* Xcode 11.6
+* Xcode 12.0
 
 ## Exceptions which can be caught ##
 
