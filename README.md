@@ -2,6 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/cvvfms6c48opx2j0?svg=true)](https://ci.appveyor.com/project/kutelev/hwtrycatch)
 [![Build Status](https://travis-ci.org/kutelev/hwtrycatch.svg?branch=master)](https://travis-ci.org/kutelev/hwtrycatch)
+[![pipeline status](https://gitlab.com/kutelev/hwtrycatch/badges/master/pipeline.svg)](https://gitlab.com/kutelev/hwtrycatch/pipelines/master/latest)
 
 ## Description ##
 
