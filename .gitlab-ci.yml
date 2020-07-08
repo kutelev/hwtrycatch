@@ -1,0 +1,41 @@
+stages:
+  - test
+
+.prepare_debian:
+  before_script:
+    - apt-get update && apt-get upgrade -y
+    - apt-get install -y git g++ make cmake
+
+.test:
+  script:
+    - git clone --branch release-1.10.0 --depth 1 https://github.com/google/googletest.git
+    - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 -G "Unix Makefiles"
+    - cmake --build . --config Release
+    - ./hwtrycatch_tests
+
+.test_on_debian:
+  variables:
+    DEBIAN_FRONTEND: noninteractive
+  extends:
+    - .prepare_debian
+    - .test
+
+test:debian:9:
+  image: debian:9
+  extends: .test_on_debian
+
+test:debian:10:
+  image: debian:10
+  extends: .test_on_debian
+
+test:ubuntu:16.04:
+  image: ubuntu:16.04
+  extends: .test_on_debian
+
+test:ubuntu:18.04:
+  image: ubuntu:18.04
+  extends: .test_on_debian
+
+test:ubuntu:20.04:
+  image: ubuntu:20.04
+  extends: .test_on_debian
