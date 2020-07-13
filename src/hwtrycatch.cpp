@@ -22,21 +22,21 @@ static thread_local ExecutionContext* execution_context = nullptr;
 template<typename T>
 class ThreadLocal final {
 public:
-    ThreadLocal() { pthread_key_create(&key, NULL); }
+    ThreadLocal() { pthread_key_create(&key, nullptr); }
     ~ThreadLocal() { pthread_key_delete(key); }
 
-    void operator=(const T* value) { set(value); }
+    ThreadLocal& operator=(const T* value) { set(value); return *this; }
 
     const T* operator*() const { return get(); }
     T* operator->() const { return get(); }
-    operator bool() const { return get(); }
-    operator T*() const { return get(); }
+    explicit operator bool() const { return get(); }
+    explicit operator T*() const { return get(); }
 
 private:
     void set(const T* value) { pthread_setspecific(key, value); }
     T* get() const { return reinterpret_cast<T*>(pthread_getspecific(key)); }
 
-    pthread_key_t key;
+    pthread_key_t key{};
 };
 
 static ThreadLocal<ExecutionContext> execution_context;
@@ -114,7 +114,7 @@ static void signalHandler(int signum)
         sigset_t signals;
         sigemptyset(&signals);
         sigaddset(&signals, signum);
-        sigprocmask(SIG_UNBLOCK, &signals, NULL);
+        sigprocmask(SIG_UNBLOCK, &signals, nullptr);
         reinterpret_cast<ExecutionContextStruct*>(static_cast<ExecutionContext*>(execution_context))->exception_type = signum;
         longjmp(execution_context->environment, 0);
     }
@@ -147,10 +147,10 @@ HwExceptionHandler::HwExceptionHandler()
         ss.ss_sp = exception_handler_stack;
         ss.ss_flags = 0;
         ss.ss_size = SIGSTKSZ;
-        sigaltstack(&ss, 0);
+        sigaltstack(&ss, nullptr);
     });
 
-    struct sigaction sa;
+    struct sigaction sa{};
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_ONSTACK;
     sa.sa_handler = signalHandler;
@@ -173,7 +173,7 @@ HwExceptionHandler::~HwExceptionHandler()
 #else
     for (int signum : handled_signals) {
         if (prev_handlers[signum - MIN_SIGNUM].sa_handler)
-            sigaction(signum, &prev_handlers[signum - MIN_SIGNUM], 0);
+            sigaction(signum, &prev_handlers[signum - MIN_SIGNUM], nullptr);
         else
             signal(signum, SIG_DFL);
     }
