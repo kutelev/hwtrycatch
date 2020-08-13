@@ -1,5 +1,3 @@
-#define NOMINMAX
-
 #include <cstdlib>
 #include <cstring>
 #include <limits>
